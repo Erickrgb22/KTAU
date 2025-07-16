@@ -1,21 +1,26 @@
-from testruns import testrun
+# 15 Jul 2025 ~ Erick Gilmore
+# KTAU Main File
+#
 
-serial = "A80ERICK"
-user = "egilmore"
-pwd = "csi.ERGB.00"
-print("Iniciando testrun")
 
-# print("RUN VENTAS SIN IMPUESTO")
-# testrun("./tc_venta_sin_impuesto.json", "./results_venta_sin_impuesto.json")
+import json
 
-# print("RUM RECARGAS")
-# testrun("./tc_recargas.json", "./results_recargas.json")
+# Appium imports
+from appium import webdriver
+from appium.webdriver.common.appiumby import AppiumBy
+from appium.options.common.base import AppiumOptions
 
-# print("RUN P.SERVICIOS")
-# testrun("./tc_pservicios.json", "./results_tc_pservicios")
+# Selenium imports
+from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 
-#print("RUN SUBSIDIOS")
-#testrun("./tc_sub.json", "./results_tc_sub.json")
 
-print("FIRE RUN")
-testrun("./Portal/FIRE_TEST.json", "./Portal/FIRE_TEST.json")
+# Main Code
+
+with open("capabilities.json", "r") as cap_file:
+    config = json.load(cap_file)
+print(config)
+options = AppiumOptions()
+options.load_capabilities(config)
+driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
