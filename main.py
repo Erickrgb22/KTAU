@@ -1,6 +1,5 @@
 # 15 Jul 2025 ~ Erick Gilmore
 # KTAU Main File
-#
 
 
 import json
