@@ -30,5 +30,3 @@ bitmap = "3238058020c1861c"
 print(bitmap)
 decoded_bitmap = decode_bitmap(bitmap)
 print(f"Decoded Bitmap: {decoded_bitmap}")
-
-msg = mti + bitmap + 
