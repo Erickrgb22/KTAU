@@ -7,6 +7,9 @@ from iso8583.specs import default_ascii as spec
 # iso8583.pp(decoded, spec)
 # iso8583.pp(encoded, spec)
 
+# 3238058020c1861c
+# 32 38 05 80 20 c1 86 1c
+
 
 # Return the Active Data Element Fields list from the bitmap
 def decode_bitmap(bitmap: str) -> list[int]:
@@ -26,7 +29,10 @@ def decode_bitmap(bitmap: str) -> list[int]:
 
 
 mti = "0200"
-bitmap = "3238058020c1861c"
-print(bitmap)
-decoded_bitmap = decode_bitmap(bitmap)
-print(f"Decoded Bitmap: {decoded_bitmap}")
+bitmap = input("Enter your Bitmap (hex string): ").replace(" ", "").strip()
+binarized_bitmap = format(int(bitmap, 16), "064b")  # Convert hex to binary string
+print(binarized_bitmap)
+if len(bitmap) != 16:
+    print("Invalid Bitmap length. It should be 16 hex characters (64 bits).")
+else:
+    print("Active Data Element Fields:", decode_bitmap(bitmap))
