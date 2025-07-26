@@ -1,5 +1,7 @@
 import os
+
 from testruns import testrun
+# from testruns import testrun
 
 serial = "A80ERICK"
 user = "egilmore"
@@ -20,3 +22,5 @@ print(os.getcwd())
 
 # print("FIRE RUN")
 # testrun("./Portal/FIRE_TEST.json", "./Portal/FIRE_TEST.json")
+input("Press Enter to continue...")
+testrun("./TP_TIPO_0.json", "./TR_TIPO_0.json")

@@ -53,56 +53,75 @@ def testrun(tests_json, results_json):
         print(f"Ejecutando {testcase[tck[0]]}")
         test = testcase[tck[1]]
         match test:
-            case "Realizar una venta":
+            case "Venta":
                 run = validar_aplica()
                 while run:
-                    monto_decimales = testcase[tck[8]]
+                    monto_decimales = testcase["Total"]
                     monto = monto_decimales.replace(",", "")
+                    tip = testcase["Propina"]
+                    currency = testcase["Moneda"]
+
+                    dcc = False
+                    if testcase["Franquicia"] != "AMEX":
+                        if currency != "" and not dcc:
+                            input(
+                                "OJO DCC no Habilitado, activar, presione Enter para continuar"
+                            )
+                            dcc = True
+                            print("DCC Activado")
+                        if currency == "" and dcc:
+                            input(
+                                "OJO DCC HABILITADO, Desactivar, presione Enter para continuar"
+                            )
+                            dcc = False
+                            print("DCC Desactivado")
+
+                    ajust = testcase["Ajuste"]
+
+                    void = False
+                    if testcase["Anular"].lower() == "si":
+                        void = True
                     print(
-                        f"Enviando Venta {testcase[tck[2]]} {testcase[tck[4]]} {monto_decimales}"
+                        f"Enviando Venta {testcase['ID Prueba']} {testcase['Franquicia']} {testcase['Entrada']} {monto_decimales}"
                     )
-                    venta(monto, "0%", "", "", "", False)
+                    venta(monto, tip, currency, ajust, void)
                     print("Venta enviada, verifique la mensajeria en el ISOHOST")
                     run = veredicto()
-            case "Realizar una Recarga":
+            case "Recarga":
                 run = validar_aplica()
                 while run:
                     monto_decimales = testcase["Total"]
                     monto = monto_decimales.replace(",", "")
                     print(
-                        f"Enviando Recarga {testcase[tck[2]]} {testcase[tck[4]]} {testcase["Proveedor"]} {testcase["Numero"]} {monto_decimales}"
+                        f"Enviando Recarga {testcase['ID Prueba']} {testcase['Franquicia']} {testcase['Entrada']} {testcase['Proveedor']} {testcase['Contrato']} {monto_decimales}"
                     )
-                    recarga(monto, testcase["Numero"], testcase["Proveedor"])
+                    recarga(monto, testcase["Contrato"], testcase["Proveedor"])
                     print("Recarga enviada, verifique la mensajeria en el ISOHOST")
                     run = veredicto()
-            case "Realizar un P.Servicio":
+            case "P.Servicio":
                 run = validar_aplica()
                 while run:
                     print(
-                        f"Enviando P.Servicio {testcase[tck[2]]} {testcase[tck[4]]} {testcase["Proveedor"]} {testcase["Numero de Contrato"]}"
+                        f"Enviando P.Servicio {testcase['ID Prueba']} {testcase['Franquicia']} {testcase['Entrada']} {testcase['Proveedor']} {testcase['Contrato']}"
                     )
-                    pago_servicio(
-                        testcase["Proveedor"], testcase["Numero de Contrato"], False
-                    )
+                    pago_servicio(testcase["Proveedor"], testcase["Contrato"], False)
                     print("P.Servicio enviado, verifique la mensajeria en el ISOHOST")
                     run = veredicto()
-            case "Realizar una consulta de Factura":
+            case "Consulta Factura":
                 run = validar_aplica()
                 while run:
                     print(
-                        f'Consultando Factura {testcase["Numero de Contrato"]} {testcase["Proveedor"]}'
+                        f"Consultando Factura {testcase['Contrato']} {testcase['Proveedor']}"
                     )
-                    pago_servicio(
-                        testcase["Proveedor"], testcase["Numero de Contrato"], True
-                    )
+                    pago_servicio(testcase["Proveedor"], testcase["Contrato"], True)
                     print("Consulta Enviada, verifique la mensajeria en el ISOHOST")
                     run = veredicto()
-            case "Realizar una Venta por Subsidio":
+            case "Subsidio":
                 init_time = time.time()
                 run = validar_aplica()
                 while run:
                     print(
-                        f'Enviando Subsidio {testcase[tck[2]]} {testcase[tck[4]]} {testcase["Tipo Subsidio"]}'
+                        f"Enviando Subsidio {testcase['ID Prueba']} {testcase['Franquicia']}  {testcase['Entrada']} {testcase['Tipo Subsidio']}"
                     )
                     monto_decimales = testcase["Total"]
                     monto = monto_decimales.replace(",", "")
@@ -111,7 +130,7 @@ def testrun(tests_json, results_json):
                     run = veredicto()
                 total_time = time.time() - init_time
                 print(f"tiempo de ejecucion: {int(total_time)}s")
-            case "Realizar Cierre":
+            case "Cierre":
                 run = validar_aplica()
                 while run:
                     print("Enviando Cierre")
