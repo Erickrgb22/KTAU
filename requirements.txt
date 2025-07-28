@@ -1,2 +1,3 @@
 structlog
 Appium-Python-Client
+pyyaml

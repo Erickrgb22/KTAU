@@ -4,17 +4,6 @@ import sys
 import time
 
 
-class SlaveTerminal():
-    config_file: str
-    target_ip: str
-    target_port: int
-
-    def __init__(
-        self
-        config_file: str = "",
-    ): ...
-
-
 def send_json_tcp():
     """
     Pide IP, puerto y campos de un mensaje JSON, lo envía por TCP y muestra la respuesta.
@@ -147,12 +136,15 @@ def send_json_tcp():
         print(
             f"Error: La conexión fue rechazada. Asegúrese de que el servidor esté activo y escuchando en {target_ip}:{target_port}."
         )
+
     except socket.timeout:
         print("Error: Tiempo de espera agotado. El servidor no respondió a tiempo.")
+
     except socket.gaierror:
         print(
             f"Error: No se pudo resolver la dirección IP '{target_ip}'. Verifique la IP o el nombre de host."
         )
+
     except Exception as e:
         print(f"Ocurrió un error inesperado: {e}")
 
