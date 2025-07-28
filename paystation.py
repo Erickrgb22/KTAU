@@ -1,6 +1,7 @@
 import socket  # Used for send commands via tcp sockets
 import json  # Used for parse commands and responses
 import time  # Used use to calculate the time of a transaction
+import sys  # Used to exit the program
 
 
 # This class is use to simulate the actions made by a PayStation
@@ -55,54 +56,83 @@ class PayStation:
                         # Decodificar la respuesta y intentar parsearla como JSON
                         decoded_response = response_data.decode("utf-8")
                         parsed_response = json.loads(decoded_response)
-                        print("\n--- Respuesta del Servidor (JSON formateado) ---")
+                        print("\n--- Response from POS (JSON) ---")
                         print(
                             json.dumps(parsed_response, indent=4)
                         )  # Pretty print con indentación
                     except json.JSONDecodeError:
-                        print("\n--- Respuesta del Servidor (no es JSON válido) ---")
+                        print("\n--- Response from POS (not valid JSON) ---")
                         print(response_data)
                     except UnicodeDecodeError:
-                        print(
-                            "\n--- Respuesta del Servidor (no se pudo decodificar UTF-8) ---"
-                        )
+                        print("\n--- Response from POS (cant decode UTF-8) ---")
                         print(
                             response_data
                         )  # Imprime bytes crudos si no se puede decodificar
                 else:
-                    print("\nNo se recibió respuesta del servidor.")
+                    print("\nPOS not response")
 
         except ConnectionRefusedError:
-            print(
-                f"Error: La conexión fue rechazada. Asegúrese de que el servidor esté activo y escuchando en {self.target_ip}:{self.target_port}."
-            )
+            print(f"Error: POS Conection Refused {self.target_ip}:{self.target_port}.")
 
         except socket.timeout:
-            print("Error: Tiempo de espera agotado. El servidor no respondió a tiempo.")
+            print("Error: POS TimeOut")
 
         except socket.gaierror:
-            print(
-                f"Error: No se pudo resolver la dirección IP '{self.target_ip}'. Verifique la IP o el nombre de host."
-            )
+            print(f"Error: Cant resolve IP address'{self.target_ip}'.")
 
         except Exception as e:
-            print(f"Ocurrió un error inesperado: {e}")
+            print(f"Unexpected Error: {e}")
 
     def update_token(self):
         if int(self.token_ecr) < 99999999:
             self.token_ecr = str(int(self.token_ecr) + 1).zfill(8)
 
-    def sale(self):
-        pass  # Implementar lógica de venta aquí
+    def sale(self, manual: bool = False):
+        self.update_token()
+        if manual:
+            while True:
+                try:
+                    base_Amount = int(input("Insert Amount: ").strip())
+                    break
+                except ValueError:
+                    print("Invalid Amount has to be a integer value type")
+
+            # WIP Implement TAX an Tip Logic, defaults to 0
+            tax1_Amount = 0
+            tax2_Amount = 0
+            tip_Amount = 0
+
+            # JSON formated command
+            command = {
+                "command": "SALE",
+                "isoNumCode": "0214",
+                "baseAmount": base_Amount,
+                "tax1Amount": tax1_Amount,
+                "tax2Amount": tax2_Amount,
+                "tipAmount": tip_Amount,
+                "tokenECR": self.token_ecr,
+            }
+            self.send_command(command)
 
     def close(self):
-        pass  # Implementar logica de venta
+        command = {"command": "CLOSE"}
+        self.send_command(command)
 
 
 if __name__ == "__main__":
-    sales = 100
     ps = PayStation()
-    while sales > 0:
-        ps.update_token()
-        print(ps.token_ecr)
-        sales -= 1
+    while True:
+        try:
+            user_in = int(
+                input("\nBienvenido seleccione una opción:\n[1] Venta\n[2] Cierre\n")
+            )
+            match user_in:
+                case 1:
+                    ps.sale(True)
+                case 2:
+                    ps.close()
+        except KeyboardInterrupt:
+            print("Sesion Cancelada")
+            sys.exit()
+        finally:
+            input("Sesion Finalizada")
