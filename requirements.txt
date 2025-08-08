@@ -1,3 +1,4 @@
 structlog
 Appium-Python-Client
 pyyaml
+tqdm
