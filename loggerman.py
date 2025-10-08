@@ -4,26 +4,10 @@ import logging
 
 from structlog.dev import ConsoleRenderer
 from structlog.stdlib import ProcessorFormatter
-# logging.basicConfig(
-#    format="%(message)s",
-#    level=logging.DEBUG,
-# )
 
 CONSOLE_LOG_LEVEL = logging.DEBUG
 FILE_LOG_LEVEL = logging.INFO
 LOG_FILE = "KTAU.log"
-
-# structlog.configure(
-#    processors=[
-#        structlog.processors.TimeStamper(fmt="iso"),
-#        structlog.processors.add_log_level,
-#        structlog.stdlib.add_logger_name,
-#        structlog.dev.ConsoleRenderer(),
-#    ],
-#    logger_factory=structlog.stdlib.LoggerFactory(),
-#    cache_logger_on_first_use=True,
-# )
-# logger = structlog.get_logger(__name__)
 
 
 class Logger:
@@ -52,9 +36,14 @@ class Logger:
         console_handler.setFormatter(console_formatter)
         console_handler.setLevel(CONSOLE_LOG_LEVEL)
 
+        # Standar POython logging configuration
         stdlib_logger = logging.getLogger(self.logger_name)
+        # Keep the root logger level to DEBUG, so all messages are processed
         stdlib_logger.setLevel(logging.DEBUG)
-        stdlib_logger.addHandler(console_handler)
+        # Add here the habdlers you need
+        stdlib_logger.addHandler(console_handler)  # Console handler
+
+        # TODO: Add Handler for file output
 
         structlog.configure(
             wrapper_class=structlog.stdlib.BoundLogger,
@@ -72,17 +61,3 @@ class Logger:
 
     def get_logger(self):
         return self._logger
-
-
-logger = Logger(__name__).get_logger()
-
-
-def test_logger():
-    logger.debug("This is a debug message")
-    logger.info("This is an info message")
-    logger.warning("This is a warning message")
-    logger.error("This is an error message")
-    try:
-        1 / 0
-    except ZeroDivisionError:
-        logger.exception("An exception occurred")
