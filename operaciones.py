@@ -1,86 +1,33 @@
-from re import sub
 import time
-import logging
-import structlog
-from tqdm import tqdm
 
-from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
-from selenium.common.exceptions import NoSuchElementException
-from appium.options.common.base import AppiumOptions
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# LOG CONFIGURATIONS
-timestamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S")
-shared_processors = [
-    structlog.stdlib.add_log_level,
-    structlog.stdlib.add_logger_name,
-    timestamper,
-]
-structlog.configure(
-    processors=shared_processors
-    + [
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
-    ],
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    cache_logger_on_first_use=True,
-)
+from loggerman import loggerman
+from thedriverfactory import DriverFactory
 
-formatter = structlog.stdlib.ProcessorFormatter(
-    processor=structlog.dev.ConsoleRenderer(),
-    foreign_pre_chain=shared_processors,
-)
-handler = logging.StreamHandler()
-handler.setFormatter(formatter)
-logger = logging.getLogger("Operaciones")
-logger.addHandler(handler)
-logger.setLevel(logging.INFO)
+logger = loggerman(__name__)
 
-# APPIUM CONFIGRATION
+# Appium Set Up
 
+appium_server_url = "http://127.0.0.1:4723"
+appium_caps = {
+    "platformName": "Android",
+    "appium:automationName": "uiautomator2",
+    "appium:deviceName": "A80",
+    "appium:appPackage": "com.kinpos.posmultiplatform.vn",
+    "appium:appActivity": ".MainActivity",
+    "appium:language": "es",
+    "appium:locale": "VE",
+    "appium:ensureWebviewsHavePages": True,
+    "appium:nativeWebScreenshot": True,
+    "appium:newCommandTimeout": 3600,
+    "appium:noReset": "true",
+    "appium:connectHardwareKeyboard": True,
+}
 
-def initialize_appium_client():
-    logger.info("Iniciando Cliente Appium")
-
-    # Configuración de las opciones de Appium
-    options = AppiumOptions()
-    options.load_capabilities(
-        {
-            "platformName": "Android",
-            "appium:automationName": "uiautomator2",
-            "appium:deviceName": "A80",
-            "appium:appPackage": "com.kinpos.posmultiplatform.vn",
-            "appium:appActivity": ".MainActivity",
-            "appium:language": "es",
-            "appium:locale": "VE",
-            "appium:ensureWebviewsHavePages": True,
-            "appium:nativeWebScreenshot": True,
-            "appium:newCommandTimeout": 3600,
-            "appium:noReset": "true",
-            "appium:connectHardwareKeyboard": True,
-        }
-    )
-
-    # Barra de progreso para la inicialización
-    with tqdm(total=3, desc="Inicializando Cliente Appium", unit="step") as pbar:
-        # Simulando pasos de inicialización
-        time.sleep(1)  # Simula un paso de configuración
-        pbar.update(1)  # Actualiza la barra de progreso
-
-        time.sleep(1)  # Simula otro paso de configuración
-        pbar.update(1)  # Actualiza la barra de progreso
-
-        # Establecer la conexión con el servidor Appium
-        driver = webdriver.Remote("http://127.0.0.1:4723", options=options)
-        pbar.update(1)  # Actualiza la barra de progreso al completar la conexión
-
-    logger.info("Cliente Appium Iniciado")
-    return driver
-
-
-driver = initialize_appium_client()
-
+driver = DriverFactory(appium_server_url, appium_caps).get_appium()
 # APPIUM OPERATIONS
 
 
@@ -234,7 +181,7 @@ def venta(monto, tip="", currency="", ajust="", void=False, sleep_time=1):
             ajust_amount.click()
             proceder_btn = wait_for_element(AppiumBy.ACCESSIBILITY_ID, "Proceder")
             proceder_btn.click()
-            logging.info(f"Venta Ajustada al: {ajust}")
+            logger.info(f"Venta Ajustada al: {ajust}")
             time.sleep(10)
         else:
             logger.info("Venta Sin Ajuste")
