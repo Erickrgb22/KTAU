@@ -74,6 +74,23 @@ class Device:
             element.click()
             logger.info(f"Clicked on element {value}")
 
+    def write_text(
+        self, by=None, value=None, timeout=30, element=None, text=""
+    ):  # write text into an element, wait for it if not provided
+        if element is None and (by is None or value is None):
+            raise ValueError("Either element or both by and value must be provided")
+        if element:
+            logger.info(f"Writing {text} on provided element")
+            self.click(element=element)
+            element.send_keys(text)
+            logger.info(f"Text {text} written on provided element")
+        else:
+            logger.info(f"Writing {text} on {value}")
+            element = self.wait_element(by, value, timeout)
+            self.click(element=element)
+            element.send_keys(text)
+            logger.info(f"Text {text} written on provided element")
+
     def hide_keyboard(self):
         logger.info("Hiding keyboard")
         try:
