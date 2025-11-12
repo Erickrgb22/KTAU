@@ -30,26 +30,40 @@ class Device:
         pass
 
     def wait_element(
-        self, by, value, timeout=30
-    ):  # This method waits for an element to be present for a given timeout
-        logger.info(f"Waiting for element {value} TO{timeout}s")
+        self, *, by=None, value=None, element=None, wait_for="presence", timeout=10
+    ):
+        if wait_for == "clickable":
+            wait_condition = EC.element_to_be_clickable
+        elif wait_for == "visible":
+            wait_condition = EC.visibility_of_element_located
+        else:
+            wait_condition = EC.presence_of_element_located
+
+        logmsg = f"Waiting for element {value if value else 'provided element'} with condition {wait_for}"
+        logger.info(logmsg)
+
         try:
-            element = WebDriverWait(self.driver, timeout).until(
-                EC.presence_of_element_located((by, value))
-            )
-            return element  # Return the element if found
+            wait = WebDriverWait(self.driver, timeout)
+            if element:
+                return wait.until(wait_condition(element))
+            elif by and value:
+                return wait.until(wait_condition((by, value)))
+            else:
+                raise ValueError("Either element or both by and value must be provided")
         except TimeoutException:
-            logger.error(f"Element {value} not found TO{timeout}s")
+            logger.error(
+                f"Timeout waiting for element {value if value else 'provided element'} with condition {wait_for}"
+            )
             raise
 
     def swipe_find(
-        self, by, value, attempts=5
+        self, by, value, attempts=5, timeout=1
     ):  # Swipe to find an element, with a number of attempts
         current_attempts = 0
         while current_attempts < attempts:
             try:
                 logger.info(f"Looking for element {value} attempt #{current_attempts}")
-                element = self.wait_element(by, value)
+                element = self.wait_element(by=by, value=value, timeout=timeout)
                 return element  # Return the element if found
             except TimeoutException:
                 logger.warning(
@@ -60,19 +74,23 @@ class Device:
         raise Exception(f"Element '{value}' not found after {attempts} swipes.")
 
     def click(
-        self, by=None, value=None, timeout=30, element=None
+        self, by=None, value=None, element=None, timeout=10
     ):  # Click an element, wait for it if not provided
         if element is None and (by is None or value is None):
             raise ValueError("Either element or both by and value must be provided")
         if element:
-            logger.info("Clicking on provided element")
-            element.click()
-            logger.info("Clicked on provided element")
+            logger.info("Elemnt Provided, waiting to be clickable")
+            clickable_element = self.wait_element(
+                element=element, wait_for="clickable", timeout=timeout
+            )
         else:
-            logger.info(f"Finding and Clicking on element {value}")
-            element = self.wait_element(by, value, timeout)
-            element.click()
-            logger.info(f"Clicked on element {value}")
+            logger.info(f"Waiting for {value} to be clickable")
+            clickable_element = self.wait_element(
+                by=by, value=value, wait_for="clickable", timeout=timeout
+            )
+        logger.info(f"Clicking on {value if value else 'provided element'}")
+        clickable_element.click()
+        logger.info(f"Clicked on {value if value else 'provided element'}")
 
     def write_text(
         self, by=None, value=None, timeout=30, element=None, text=""
@@ -86,7 +104,7 @@ class Device:
             logger.info(f"Text {text} written on provided element")
         else:
             logger.info(f"Writing {text} on {value}")
-            element = self.wait_element(by, value, timeout)
+            element = self.wait_element(by=by, value=value, timeout=timeout)
             self.click(element=element)
             element.send_keys(text)
             logger.info(f"Text {text} written on provided element")
@@ -100,7 +118,7 @@ class Device:
             logger.error(f"Error hiding keyboard: {e}")
             raise
 
-    def type_amount(self, amount):
+    def type_amount(self, amount, timeout=2):
         logger.info(f"Typing amount: {amount}")
         for char in amount:
-            self.click(by=AppiumBy.ACCESSIBILITY_ID, value=char)
+            self.click(by=AppiumBy.ACCESSIBILITY_ID, value=char, timeout=timeout)

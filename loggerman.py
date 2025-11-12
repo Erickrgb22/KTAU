@@ -12,7 +12,7 @@ from structlog.stdlib import ProcessorFormatter
 
 # TODO: change log levels based on environment (dev/prod)
 
-CONSOLE_LOG_LEVEL = logging.DEBUG
+CONSOLE_LOG_LEVEL = logging.INFO
 FILE_LOG_LEVEL = logging.INFO
 LOG_FILE = "KTAU.log"
 
