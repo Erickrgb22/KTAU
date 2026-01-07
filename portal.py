@@ -38,6 +38,7 @@ class PortalApp(Device):
     def void_txn(self, timeout=30):
         logger.info("Voiding Transaction")
         self.driver.tap([(248, 548)], 5)
+        # self.driver.tap([(377, 878)], 5)
         self.click(AppiumBy.ACCESSIBILITY_ID, "Anular")
         self.click(AppiumBy.ACCESSIBILITY_ID, "Continuar")
         if self.wait_element(
@@ -54,6 +55,7 @@ class PortalApp(Device):
     def ajust_txn(self, ajust, timeout=30):
         logger.info(f"Ajusting Transaction to {ajust}")
         self.driver.tap([(248, 548)], 5)
+        # self.driver.tap([(377, 878)], 5)
         self.click(AppiumBy.ACCESSIBILITY_ID, "Ajustar")
         self.click(AppiumBy.ACCESSIBILITY_ID, f"{ajust}")
         self.click(AppiumBy.ACCESSIBILITY_ID, "Proceder")
@@ -217,8 +219,8 @@ if __name__ == "__main__":
     driver_factory = DriverFactory(appium_server_url, appium_caps)
     appium_driver = driver_factory.get_appium()
     app = PortalApp(appium_driver)
-    # app.login("A80ERICK", "egilmore", "csi.ERGB.00")
-    dcc_config = False
+    app.login("A80ERICK", "egilmore", "csi.ERGB.00")
+    dcc_config = True
     app.sale(amount="1000", dcc=dcc_config)
     app.sale(amount="2000", tip="10%", dcc=dcc_config)
     app.sale(amount="3000", ajust="10%", dcc=dcc_config)
