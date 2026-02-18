@@ -170,7 +170,7 @@ if __name__ == "__main__":
     #        print(f"An error occurred: {e}")
     #        pass
 
-    ps = PayStation("10.1.1.27", target_port=59800)
+    ps = PayStation("192.168.88.23", target_port=59800)
     while True:
         try:
             user_in = int(input("\nSession Started:\n[1] SALE\n[2] CLOSE\n[3] VOID\n"))

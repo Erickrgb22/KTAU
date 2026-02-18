@@ -56,6 +56,9 @@ class Device:
             )
             raise
 
+    def is_element_present(self, by, value, timeout=5):
+        return self.wait_element(by=by, value=value, timeout=timeout) is not None
+
     def swipe_find(
         self, by, value, attempts=5, timeout=1
     ):  # Swipe to find an element, with a number of attempts

@@ -55,6 +55,8 @@ class PortalApp(Device):
     def ajust_txn(self, ajust, timeout=30):
         logger.info(f"Ajusting Transaction to {ajust}")
         self.driver.tap([(248, 548)], 5)
+        # TODO: Implementar metodo para cordenadas variables segun modelo de dispositivo
+        #
         # self.driver.tap([(377, 878)], 5)
         self.click(AppiumBy.ACCESSIBILITY_ID, "Ajustar")
         self.click(AppiumBy.ACCESSIBILITY_ID, f"{ajust}")
@@ -220,7 +222,7 @@ if __name__ == "__main__":
     appium_driver = driver_factory.get_appium()
     app = PortalApp(appium_driver)
     app.login("A80ERICK", "egilmore", "csi.ERGB.00")
-    dcc_config = True
+    dcc_config = False
     app.sale(amount="1000", dcc=dcc_config)
     app.sale(amount="2000", tip="10%", dcc=dcc_config)
     app.sale(amount="3000", ajust="10%", dcc=dcc_config)

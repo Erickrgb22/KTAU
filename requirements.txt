@@ -1,2 +1,5 @@
 structlog
 Appium-Python-Client
+tqdm
+tabulate
+pyISO8583
